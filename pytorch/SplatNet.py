@@ -8,13 +8,13 @@ import torch.nn as nn
 import torch.optim
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
+from SparseLatticeNetwork import SplatNet
 
 def make_one_hot(targets, C):
     targets_extend=targets.clone()
     targets_extend.unsqueeze_(1) # convert to Nx1xHxW
     one_hot = torch.cuda.FloatTensor(targets_extend.size(0), C, targets_extend.size(2), targets_extend.size(3)).zero_()
     one_hot.scatter_(1, targets_extend, 1) 
-
     return one_hot.reshape(targets.shape[1],targets.shape[2],C)
   
 def accuracy(y, labels):
@@ -52,10 +52,10 @@ print("Data:", y_one_hot.shape, X.shape)
 
 model = SplatNet(num_classes)
 
-'''if(torch.cuda.is_available()):
+if(torch.cuda.is_available()):
   print('Cuda is available')
-  model = model.cuda()'''
-
+  model = model.cuda()
+    
 criterion = nn.CrossEntropyLoss()
 count        = 0
 learningRate = 0.001 
