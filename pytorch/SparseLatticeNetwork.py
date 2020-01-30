@@ -1,8 +1,5 @@
-import os.path
+import os
 import sys
-
-#ROOT_DIR = os.path.abspath(os.path.pardir)
-#sys.path.append(ROOT_DIR)
 import torch
 if(torch.cuda.is_available()): import torch.cuda as torch
 else: import torch as torch
