@@ -3,14 +3,11 @@ import sys
 
 #ROOT_DIR = os.path.abspath(os.path.pardir)
 #sys.path.append(ROOT_DIR)
-'''import torch
-if(torch.cuda.is_available()):
-  import torch.cuda as torch
-else:
-  import torch as torch'''
 import torch
+if(torch.cuda.is_available()): import torch.cuda as torch
+else: import torch as torch
 import torch.nn as nn
-#from bcl import BCL
+from BilateralConvolutionalLayer import BCL
 
 class SplatNet(nn.Module):
     def __init__(self, num_classes):
@@ -27,31 +24,20 @@ class SplatNet(nn.Module):
         self.bcl1 = BCL(N=64, C=32, Cp=1)
         self.bcl2 = BCL(N=32, C=64, Cp=32)
         self.bcl3 = BCL(N=32, C=128, Cp=64)
-        self.bcl4 = BCL(N=16, C=128, Cp=128)
-        
-        #print("Num of channels:", num_channels)
-        #print("Prev data:", self.prev_data.shape)
-        #print("Data:", self.data.shape)
-        
+        self.bcl4 = BCL(N=16, C=128, Cp=128)      
     
     def forward(self, data):
         self.data = data
         self.num_points = data.shape[0]
         num_channels = data.shape[1]
         self.prev_data = data.reshape(1, num_channels, self.num_points, 1, 1)
-      
-        #print("Num of channels:", num_channels)
-        #print("Prev data:", self.prev_data.shape)
-        #print("Data:", self.data.shape)
              
-        data_conv1 = self.conv1_initial(self.prev_data)      
-        #print(" Output of initial conv:", data_conv1.shape)
+        data_conv1 = self.conv1_initial(self.prev_data) 
         out1 = self.bcl1(data, data_conv1)        
         out2 = self.bcl2(data, out1)
         out3 = self.bcl3(data, out2)
         out4 = self.bcl4(data, out3)
         out = torch.cat((out1, out2, out3, out4), dim=1)
-        #print("Output after concatenation: ", out.shape)
         out = self.conv1_f1(out)
         out = self.conv1_f2(out)
         
